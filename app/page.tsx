@@ -125,15 +125,22 @@ export default function Home() {
           )}
 
           {(alreadyVotedError || voted) && !showSuccess && (
-            <Alert className="flex flex-row items-start gap-3 border-destructive/80 bg-destructive/5 text-destructive">
-              <CircleX className="size-4 shrink-0 translate-y-0.5 text-destructive/60" />
-              <div className="flex flex-1 flex-col gap-1">
-                <AlertTitle>Already voted</AlertTitle>
-                <AlertDescription className="text-destructive/80">
-                  You have already voted. You can only vote once.
-                </AlertDescription>
+            <div className="space-y-2">
+              <Alert className="flex flex-row items-start gap-3 border-destructive/80 bg-destructive/5 text-destructive">
+                <CircleX className="size-4 shrink-0 translate-y-0.5 text-destructive/60" />
+                <div className="flex flex-1 flex-col gap-1">
+                  <AlertTitle>Already voted</AlertTitle>
+                  <AlertDescription className="text-destructive/80">
+                    You have already voted. You can only vote once.
+                  </AlertDescription>
+                </div>
+              </Alert>
+              <div className="text-center text-xs font-medium text-[#6b6b6b]">
+                {totalVotes !== undefined
+                  ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} have voted, counting...`
+                  : "Counting..."}
               </div>
-            </Alert>
+            </div>
           )}
 
           {!voted && (
