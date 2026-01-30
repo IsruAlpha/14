@@ -26,6 +26,8 @@ import { CallToAction } from "@/components/cta";
 const VOTER_ID_KEY = "poll_voter_id";
 const HAS_VOTED_KEY = "poll_has_voted";
 
+const STATUS_VALUES = ["single", "relationship"] as const;
+
 function getOrCreateVoterId(): string {
   if (typeof window === "undefined") return "";
   let id = localStorage.getItem(VOTER_ID_KEY);
@@ -37,7 +39,9 @@ function getOrCreateVoterId(): string {
 }
 
 const formSchema = z.object({
-  status: z.enum(["single", "relationship"]),
+  status: z.enum(STATUS_VALUES, {
+    message: "Please select your relationship status.",
+  }),
 });
 
 

@@ -91,7 +91,7 @@ export function CallToAction() {
         >
           channel
         </a>{" "}
-        for the launch
+        for the launch.
       </p>
 
       <div className="grid w-full grid-cols-4 gap-2 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-3 md:gap-4">
