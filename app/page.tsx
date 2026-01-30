@@ -37,10 +37,9 @@ function getOrCreateVoterId(): string {
 }
 
 const formSchema = z.object({
-  status: z.enum(["single", "relationship"], {
-    required_error: "Please select your relationship status.",
-  }),
+  status: z.enum(["single", "relationship"]),
 });
+
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
