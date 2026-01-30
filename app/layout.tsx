@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Relationship Status Poll",
+  title: "14",
   description: "A simple real-time poll",
   icons: {
     icon: "/favicon.png",
