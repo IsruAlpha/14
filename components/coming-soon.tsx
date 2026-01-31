@@ -17,10 +17,10 @@ export function ComingSoonPage({ onEditProfile }: ComingSoonPageProps) {
         <div className="w-full flex justify-center py-24 px-6 sm:py-32 sm:px-12">
             <Empty>
                 <EmptyHeader>
-                    <EmptyTitle className="font-mono text-4xl font-black sm:text-5xl md:text-6xl lg:text-7xl text-center leading-[1.1] tracking-tight text-gray-900">
-                        Next Feature <br className="sm:hidden" /> Coming Soon...
+                    <EmptyTitle className="font-mono text-3xl font-black sm:text-5xl md:text-6xl lg:text-7xl text-center leading-[1.1] tracking-tight text-gray-900">
+                        Next Feature <br /> Coming Soon...
                     </EmptyTitle>
-                    <EmptyDescription className="text-base sm:text-lg mt-6 max-w-md mx-auto text-gray-600">
+                    <EmptyDescription className="text-sm sm:text-lg mt-4 max-w-xs sm:max-w-md mx-auto text-gray-600">
                         I'm working on something amazing!
                     </EmptyDescription>
                 </EmptyHeader>
