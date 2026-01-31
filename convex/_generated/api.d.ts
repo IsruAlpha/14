@@ -10,6 +10,7 @@
 
 import type * as myFunctions from "../myFunctions.js";
 import type * as poll from "../poll.js";
+import type * as profiles from "../profiles.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   myFunctions: typeof myFunctions;
   poll: typeof poll;
+  profiles: typeof profiles;
 }>;
 
 /**

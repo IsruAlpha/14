@@ -22,6 +22,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CallToAction } from "@/components/cta";
+import HoverSlatButton from "@/components/ui/hover-button";
+import { ProfileForm } from "@/components/profile-form";
+import { ProfileDropdown } from "@/components/profile-dropdown";
+import { ComingSoonPage } from "@/components/coming-soon";
 
 const VOTER_ID_KEY = "poll_voter_id";
 const HAS_VOTED_KEY = "poll_has_voted";
@@ -44,6 +48,7 @@ const formSchema = z.object({
   }),
 });
 
+type ViewState = "voting" | "profile-form" | "profile-complete";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -51,6 +56,8 @@ export default function Home() {
   const [voted, setVoted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [alreadyVotedError, setAlreadyVotedError] = useState(false);
+  const [viewState, setViewState] = useState<ViewState>("voting");
+  const [userStatus, setUserStatus] = useState<"single" | "relationship">("single");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,12 +65,33 @@ export default function Home() {
 
   const vote = useMutation(api.poll.vote);
   const totalVotes = useQuery(api.poll.getTotalVotes);
+  const userVote = useQuery(api.poll.getUserVote, voterId ? { voterId } : "skip");
+  const profile = useQuery(
+    api.profiles.getProfile,
+    voterId ? { voterId } : "skip"
+  );
 
   useEffect(() => {
     setMounted(true);
-    setVoterId(getOrCreateVoterId());
+    const id = getOrCreateVoterId();
+    setVoterId(id);
     setVoted(localStorage.getItem(HAS_VOTED_KEY) === "true");
   }, []);
+
+  // Sync userStatus with vote if profile doesn't exist yet but user has voted
+  useEffect(() => {
+    if (userVote && !profile) {
+      setUserStatus(userVote.status);
+    }
+  }, [userVote, profile]);
+
+  // Check if profile exists and update view state
+  useEffect(() => {
+    if (profile) {
+      setViewState("profile-complete");
+      setUserStatus(profile.status);
+    }
+  }, [profile]);
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
@@ -76,6 +104,7 @@ export default function Home() {
         localStorage.setItem(HAS_VOTED_KEY, "true");
         setVoted(true);
         setShowSuccess(true);
+        setUserStatus(values.status);
         form.reset();
       } catch (err) {
         const message = err instanceof Error ? err.message : "";
@@ -90,6 +119,26 @@ export default function Home() {
     [vote, form]
   );
 
+  const handleBuildClick = () => {
+    if (voted && viewState === "voting") {
+      setViewState("profile-form");
+    }
+  };
+
+  const handleProfileCreated = () => {
+    setViewState("profile-complete");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(VOTER_ID_KEY);
+    localStorage.removeItem(HAS_VOTED_KEY);
+    window.location.reload();
+  };
+
+  const handleEditProfile = () => {
+    setViewState("profile-form");
+  };
+
   if (!mounted) {
     return (
       <main className="min-h-screen bg-[#EAE5E0] flex flex-col">
@@ -101,121 +150,180 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#EAE5E0] flex flex-col">
-      <div className="flex flex-1 flex-col items-center justify-center p-6">
-        <div className="w-full max-w-md space-y-6">
-          {showSuccess && (
-            <Alert className="flex flex-row items-start gap-3 border-success/80 bg-success/5 text-success">
-              <CircleCheck className="size-4 shrink-0 translate-y-0.5 text-success/60" />
-              <div className="flex flex-1 flex-col gap-1">
-                <AlertTitle>Success</AlertTitle>
-                <AlertDescription className="text-success/80">
-                  Your vote has been recorded successfully.
-                </AlertDescription>
-                <Button
-                  className="mt-2 w-fit bg-success text-white hover:bg-success/90"
-                  size="sm"
-                  variant="default"
-                  onClick={() => setShowSuccess(false)}
-                >
-                  Dismiss
-                </Button>
-              </div>
-            </Alert>
-          )}
+    <main className="relative min-h-screen overflow-hidden bg-[#EAE5E0]">
+      {/* Profile Dropdown - Top Right */}
+      {viewState === "profile-complete" && profile && (
+        <div className="absolute right-6 top-6 z-10">
+          <ProfileDropdown
+            fullName={profile.fullName}
+            status={profile.status === "single" ? "Single" : "In Relationship"}
+            imageUrl={profile.imageUrl ?? undefined}
+            onLogout={handleLogout}
+            onEditProfile={handleEditProfile}
+          />
+        </div>
+      )}
 
-          {(alreadyVotedError || voted) && !showSuccess && (
-            <div className="space-y-2">
-              <Alert className="flex flex-row items-start gap-3 border-destructive/80 bg-destructive/5 text-destructive">
-                <CircleX className="size-4 shrink-0 translate-y-0.5 text-destructive/60" />
-                <div className="flex flex-1 flex-col gap-1">
-                  <AlertTitle>Already voted</AlertTitle>
-                  <AlertDescription className="text-destructive/80">
-                    You have already voted. You can only vote once.
-                  </AlertDescription>
+      {/* Sliding Container */}
+      <div
+        className="flex min-h-screen transition-transform duration-700 ease-in-out"
+        style={{
+          transform:
+            viewState === "voting"
+              ? "translateX(0)"
+              : viewState === "profile-form"
+                ? "translateX(-100vw)"
+                : "translateX(-200vw)",
+          width: "300vw",
+        }}
+      >
+        {/* Voting View */}
+        <div className="flex min-h-screen w-screen flex-col">
+          <div className="flex flex-1 flex-col items-center justify-center p-6">
+            <div className="w-full max-w-md space-y-6">
+              {showSuccess && (
+                <Alert className="flex flex-row items-start gap-3 border-success/80 bg-success/5 text-success">
+                  <CircleCheck className="size-4 shrink-0 translate-y-0.5 text-success/60" />
+                  <div className="flex flex-1 flex-col gap-1">
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription className="text-success/80">
+                      Your vote has been recorded successfully.
+                    </AlertDescription>
+                    <Button
+                      className="mt-2 w-fit bg-success text-white hover:bg-success/90"
+                      size="sm"
+                      variant="default"
+                      onClick={() => setShowSuccess(false)}
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                </Alert>
+              )}
+
+              {(alreadyVotedError || voted) && !showSuccess && (
+                <div className="space-y-2">
+                  <Alert className="flex flex-row items-start gap-3 border-destructive/80 bg-destructive/5 text-destructive">
+                    <CircleX className="size-4 shrink-0 translate-y-0.5 text-destructive/60" />
+                    <div className="flex flex-1 flex-col gap-1">
+                      <AlertTitle>Already voted</AlertTitle>
+                      <AlertDescription className="text-destructive/80">
+                        You have already voted. You can only vote once.
+                      </AlertDescription>
+                    </div>
+                  </Alert>
+                  <div className="text-center text-xs font-medium text-[#6b6b6b]">
+                    {totalVotes !== undefined
+                      ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} have voted, counting...`
+                      : "Counting..."}
+                  </div>
                 </div>
-              </Alert>
-              <div className="text-center text-xs font-medium text-[#6b6b6b]">
-                {totalVotes !== undefined
-                  ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} have voted, counting...`
-                  : "Counting..."}
-              </div>
-            </div>
-          )}
+              )}
 
-          {!voted && (
-            <section className="rounded-none border-0 bg-[#FBFAF8] p-6 shadow-none">
-              <Form {...form}>
-                <form
-                  className="space-y-6"
-                  onSubmit={form.handleSubmit(onSubmit)}
-                >
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel className="text-base font-semibold text-[#2c2c2c]">
-                          Your relationship status
-                        </FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            className="flex flex-col space-y-2"
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                id="single"
-                                value="single"
-                                className="border-[#c4bfb8] text-[#4285F4]"
-                              />
-                              <Label
-                                htmlFor="single"
-                                className="cursor-pointer font-normal text-[#2c2c2c]"
+              {!voted && (
+                <section className="rounded-none border-0 bg-[#FBFAF8] p-6 shadow-none">
+                  <Form {...form}>
+                    <form
+                      className="space-y-6"
+                      onSubmit={form.handleSubmit(onSubmit)}
+                    >
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel className="text-base font-semibold text-[#2c2c2c]">
+                              Your relationship status
+                            </FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                className="flex flex-col space-y-2"
+                                value={field.value}
+                                onValueChange={field.onChange}
                               >
-                                Single
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                id="relationship"
-                                value="relationship"
-                                className="border-[#c4bfb8] text-[#4285F4]"
-                              />
-                              <Label
-                                htmlFor="relationship"
-                                className="cursor-pointer font-normal text-[#2c2c2c]"
-                              >
-                                In relationship
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormDescription className="text-[#6b6b6b] text-sm">
-                          {totalVotes !== undefined
-                            ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} voted so far`
-                            : "Loading..."}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem
+                                    id="single"
+                                    value="single"
+                                    className="border-[#c4bfb8] text-[#4285F4]"
+                                  />
+                                  <Label
+                                    htmlFor="single"
+                                    className="cursor-pointer font-normal text-[#2c2c2c]"
+                                  >
+                                    Single
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem
+                                    id="relationship"
+                                    value="relationship"
+                                    className="border-[#c4bfb8] text-[#4285F4]"
+                                  />
+                                  <Label
+                                    htmlFor="relationship"
+                                    className="cursor-pointer font-normal text-[#2c2c2c]"
+                                  >
+                                    In relationship
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormDescription className="text-[#6b6b6b] text-sm">
+                              {totalVotes !== undefined
+                                ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} voted so far`
+                                : "Loading..."}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="w-full bg-[#4285F4] text-white hover:bg-[#3367D6] py-6 text-base font-medium rounded-md"
+                        suppressHydrationWarning
+                      >
+                        Submit
+                      </Button>
+                    </form>
+                  </Form>
+                </section>
+              )}
+
+              {/* Build/Start Button - Only show after voting */}
+              {voted && viewState === "voting" && (
+                <div className="flex justify-center pt-4">
+                  <HoverSlatButton
+                    initialText="BUILD"
+                    hoverText="START"
+                    onClick={handleBuildClick}
                   />
-                  <Button
-                    type="submit"
-                    className="w-full bg-[#4285F4] text-white hover:bg-[#3367D6] py-6 text-base font-medium rounded-md"
-                    suppressHydrationWarning
-                  >
-                    Submit
-                  </Button>
-                </form>
-              </Form>
-            </section>
-          )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <CallToAction />
+        </div>
+
+        {/* Profile Form View */}
+        <div className="flex min-h-screen w-screen flex-col items-center justify-center p-6">
+          <ProfileForm
+            voterId={voterId}
+            userStatus={userStatus}
+            onProfileCreated={handleProfileCreated}
+            existingProfile={profile ? {
+              fullName: profile.fullName,
+              imageUrl: profile.imageUrl ?? undefined
+            } : null}
+          />
+        </div>
+
+        {/* Profile Complete View */}
+        <div className="flex min-h-screen w-screen flex-col items-center justify-center">
+          <ComingSoonPage onEditProfile={handleEditProfile} />
         </div>
       </div>
-
-      <CallToAction />
     </main>
   );
 }

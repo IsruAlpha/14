@@ -38,3 +38,13 @@ export const hasVoted = query({
     return vote !== null;
   },
 });
+
+export const getUserVote = query({
+  args: { voterId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("votes")
+      .filter((q) => q.eq(q.field("voterId"), args.voterId))
+      .first();
+  },
+});

@@ -9,4 +9,11 @@ export default defineSchema({
     voterId: v.optional(v.string()),
     status: v.union(v.literal("single"), v.literal("relationship")),
   }),
+  profiles: defineTable({
+    voterId: v.string(),
+    fullName: v.string(),
+    status: v.union(v.literal("single"), v.literal("relationship")),
+    imageId: v.optional(v.id("_storage")),
+    createdAt: v.number(),
+  }).index("by_voter_id", ["voterId"]),
 });
