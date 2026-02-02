@@ -26,6 +26,7 @@ import HoverSlatButton from "@/components/ui/hover-button";
 import { ProfileForm } from "@/components/profile-form";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { ComingSoonPage } from "@/components/coming-soon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const VOTER_ID_KEY = "poll_voter_id";
 const HAS_VOTED_KEY = "poll_has_voted";
@@ -141,32 +142,19 @@ export default function Home() {
 
   if (!mounted) {
     return (
-      <main className="min-h-screen bg-[#EAE5E0] flex flex-col">
+      <main className="h-screen bg-transparent flex flex-col overflow-hidden">
         <div className="flex flex-1 flex-col items-center justify-center p-6">
-          <div className="w-full max-w-md text-center text-[#6b6b6b]">Loading...</div>
+          <div className="w-full max-w-md text-center text-muted-foreground">Loading...</div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#EAE5E0]">
-      {/* Profile Dropdown - Top Right */}
-      {viewState === "profile-complete" && profile && (
-        <div className="absolute right-6 top-6 z-10">
-          <ProfileDropdown
-            fullName={profile.fullName}
-            status={profile.status === "single" ? "Single" : "In Relationship"}
-            imageUrl={profile.imageUrl ?? undefined}
-            onLogout={handleLogout}
-            onEditProfile={handleEditProfile}
-          />
-        </div>
-      )}
+    <main className="relative h-screen w-full overflow-hidden bg-transparent">
 
-      {/* Sliding Container */}
       <div
-        className="flex min-h-screen transition-transform duration-700 ease-in-out"
+        className="flex h-screen transition-transform duration-700 ease-in-out"
         style={{
           transform:
             viewState === "voting"
@@ -178,8 +166,8 @@ export default function Home() {
         }}
       >
         {/* Voting View */}
-        <div className="flex min-h-screen w-screen flex-col">
-          <div className="flex flex-1 flex-col items-center justify-center p-6">
+        <div className="flex h-screen w-screen flex-col overflow-y-auto">
+          <div className="flex flex-1 flex-col items-center justify-center p-6 py-12 md:py-20">
             <div className="w-full max-w-md space-y-6">
               {showSuccess && (
                 <Alert className="flex flex-row items-start gap-3 border-success/80 bg-success/5 text-success">
@@ -212,7 +200,7 @@ export default function Home() {
                       </AlertDescription>
                     </div>
                   </Alert>
-                  <div className="text-center text-xs font-medium text-[#6b6b6b]">
+                  <div className="text-center text-xs font-medium text-muted-foreground">
                     {totalVotes !== undefined
                       ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} have voted, counting...`
                       : "Counting..."}
@@ -221,7 +209,7 @@ export default function Home() {
               )}
 
               {!voted && (
-                <section className="rounded-none border-0 bg-[#FBFAF8] p-6 shadow-none">
+                <section className="rounded-none border-0 bg-card p-6 shadow-none">
                   <Form {...form}>
                     <form
                       className="space-y-6"
@@ -232,7 +220,7 @@ export default function Home() {
                         name="status"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel className="text-base font-semibold text-[#2c2c2c]">
+                            <FormLabel className="text-base font-semibold text-foreground">
                               Your relationship status
                             </FormLabel>
                             <FormControl>
@@ -249,7 +237,7 @@ export default function Home() {
                                   />
                                   <Label
                                     htmlFor="single"
-                                    className="cursor-pointer font-normal text-[#2c2c2c]"
+                                    className="cursor-pointer font-normal text-foreground"
                                   >
                                     Single
                                   </Label>
@@ -262,14 +250,14 @@ export default function Home() {
                                   />
                                   <Label
                                     htmlFor="relationship"
-                                    className="cursor-pointer font-normal text-[#2c2c2c]"
+                                    className="cursor-pointer font-normal text-foreground"
                                   >
                                     In relationship
                                   </Label>
                                 </div>
                               </RadioGroup>
                             </FormControl>
-                            <FormDescription className="text-[#6b6b6b] text-sm">
+                            <FormDescription className="text-muted-foreground text-sm">
                               {totalVotes !== undefined
                                 ? `${totalVotes} ${totalVotes === 1 ? "person" : "people"} voted so far`
                                 : "Loading..."}
@@ -307,7 +295,7 @@ export default function Home() {
         </div>
 
         {/* Profile Form View */}
-        <div className="flex min-h-screen w-screen flex-col items-center justify-center p-6">
+        <div className="flex h-screen w-screen flex-col items-center justify-center p-6 overflow-y-auto">
           <ProfileForm
             voterId={voterId}
             userStatus={userStatus}
@@ -320,9 +308,23 @@ export default function Home() {
         </div>
 
         {/* Profile Complete View */}
-        <div className="flex min-h-screen w-screen flex-col items-center justify-center">
+        <div className="flex h-screen w-screen flex-col items-center overflow-y-auto overflow-x-hidden">
           <ComingSoonPage onEditProfile={handleEditProfile} />
         </div>
+      </div>
+
+      {/* Top Controls - Global for this page */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:bottom-auto md:left-auto md:right-6 md:top-6 md:translate-x-0 z-50 flex items-center gap-2 rounded-full border border-border/40 bg-background/50 p-1 backdrop-blur-md shadow-lg transition-all active:scale-95 sm:shadow-sm">
+        <ThemeToggle />
+        {viewState === "profile-complete" && profile && (
+          <ProfileDropdown
+            fullName={profile.fullName}
+            status={profile.status === "single" ? "Single" : "In Relationship"}
+            imageUrl={profile.imageUrl ?? undefined}
+            onLogout={handleLogout}
+            onEditProfile={handleEditProfile}
+          />
+        )}
       </div>
     </main>
   );

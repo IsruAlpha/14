@@ -49,66 +49,67 @@ export function CallToAction() {
   ] as const;
 
   return (
-    <section
-      className="relative mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-y-6 px-8 py-10 md:px-12 md:py-12"
-      style={{
-        backgroundColor: "#fbfbfb93",
-        borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.1)"
-      }}
-    >
+    <section className="relative mx-auto flex w-full max-w-4xl flex-col items-center justify-center gap-y-8 px-8 py-16 md:px-12 md:py-24">
+      {/* Background Illustration / Decoration */}
+      <div className="flex w-full justify-center opacity-90 transition-all hover:opacity-100 dark:brightness-90">
+        <img
+          src="/launch-illustration.png"
+          alt="Launch Celebration"
+          className="h-auto w-full max-w-md object-contain"
+        />
+      </div>
       {/* Corner Plus Icons */}
       <PlusIcon
-        className="absolute left-[-12px] top-[-12px] size-6 text-gray-500"
+        className="absolute left-[-12px] top-[-12px] size-6 text-muted-foreground/40"
         strokeWidth={1}
         aria-hidden
       />
       <PlusIcon
-        className="absolute right-[-12px] top-[-12px] size-6 text-gray-500"
+        className="absolute right-[-12px] top-[-12px] size-6 text-muted-foreground/40"
         strokeWidth={1}
         aria-hidden
       />
       <PlusIcon
-        className="absolute bottom-[-12px] left-[-12px] size-6 text-gray-500"
+        className="absolute bottom-[-12px] left-[-12px] size-6 text-muted-foreground/40"
         strokeWidth={1}
         aria-hidden
       />
       <PlusIcon
-        className="absolute bottom-[-12px] right-[-12px] size-6 text-gray-500"
+        className="absolute bottom-[-12px] right-[-12px] size-6 text-muted-foreground/40"
         strokeWidth={1}
         aria-hidden
       />
 
-      {/* Heading */}
-      <h2 className="text-center text-2xl font-semibold leading-tight text-gray-700 md:text-3xl lg:text-4xl">
-        Everyone will know. &quot;Statistically&quot;
-      </h2>
+      <div className="space-y-4">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+          Everyone will know. &quot;Statistically&quot;
+        </h2>
 
-      {/* Subtext */}
-      <p className="text-balance text-center text-sm font-medium text-gray-600 md:text-base">
-        Wait on our{" "}
-        <a
-          href="https://t.me/day_dreamers1"
-          target="_blank"
-          rel="noreferrer"
-          className="underline decoration-gray-500 underline-offset-2 transition-colors hover:text-gray-800"
-        >
-          channel
-        </a>{" "}
-        for the launch.
-      </p>
+        <p className="mx-auto max-w-lg text-balance text-center text-sm font-medium text-muted-foreground md:text-base">
+          Wait on our{" "}
+          <a
+            href="https://t.me/day_dreamers1"
+            target="_blank"
+            rel="noreferrer"
+            className="text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary"
+          >
+            channel
+          </a>{" "}
+          for the launch.
+        </p>
+      </div>
 
       {/* Countdown Timer */}
-      <div className="flex w-full max-w-2xl items-center justify-center gap-3 md:gap-4">
+      <div className="flex w-full items-center justify-center gap-2 sm:gap-4">
         {parts.map(({ value, label }) => (
           <div
             key={label}
-            className="flex flex-1 flex-col items-center justify-center rounded-lg bg-[#D8D8D6] px-4 py-4 shadow-sm md:px-6 md:py-5"
+            className="group flex flex-1 flex-col items-center justify-center rounded-2xl border border-border/40 bg-card/30 px-3 py-4 backdrop-blur-sm transition-all hover:bg-card/50 sm:px-6 sm:py-6"
           >
-            <span className="text-3xl font-bold tabular-nums text-gray-900 md:text-4xl lg:text-5xl">
+            <span className="text-2xl font-black tabular-nums text-foreground sm:text-4xl md:text-5xl">
               {String(value).padStart(2, "0")}
             </span>
-            <span className="mt-1 text-xs font-semibold uppercase tracking-wide text-gray-600 md:text-sm">
+            <span className="mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground sm:text-xs">
               {label}
             </span>
           </div>

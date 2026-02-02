@@ -48,3 +48,17 @@ export const getUserVote = query({
       .first();
   },
 });
+export const getVoteStats = query({
+  handler: async (ctx) => {
+    const votes = await ctx.db.query("votes").collect();
+    const stats = votes.reduce(
+      (acc, vote) => {
+        if (vote.status === "single") acc.single++;
+        else if (vote.status === "relationship") acc.relationship++;
+        return acc;
+      },
+      { single: 0, relationship: 0 }
+    );
+    return stats;
+  },
+});

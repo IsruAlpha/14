@@ -111,8 +111,8 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
     return (
         <div className="w-full max-w-md space-y-6">
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">Create Your Profile</h2>
-                <p className="mt-2 text-sm text-gray-600">
+                <h2 className="text-2xl font-bold text-foreground">Create Your Profile</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
                     Complete your profile to get started
                 </p>
             </div>
@@ -127,7 +127,7 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
                                 <FormLabel>Full Name</FormLabel>
                                 <FormControl>
                                     <Input
-                                        className="bg-white"
+                                        className="bg-card"
                                         placeholder="John Doe"
                                         {...field}
                                     />
@@ -145,7 +145,7 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
                                 <FormLabel>Status</FormLabel>
                                 <FormControl>
                                     <Input
-                                        className="bg-gray-100"
+                                        className="bg-muted"
                                         {...field}
                                         disabled
                                         readOnly
@@ -165,7 +165,7 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className="bg-white"
+                                    className="bg-card"
                                 />
                                 {imagePreview && (
                                     <div className="mt-2 flex justify-center">
