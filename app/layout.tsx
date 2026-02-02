@@ -18,8 +18,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "14",
-  description: "A simple real-time poll",
+  title: "14 - The Valentine's Day Poll | Everyone will know.",
+  description: "Join the largest real-time Valentine's Day poll. Are you single or in a relationship? Cast your vote and see where you stand statistically this February 14th.",
+  keywords: ["Valentine's Day", "Poll", "Relationship Status", "February 14", "Love Statistics", "Real-time Poll"],
+  authors: [{ name: "14 Team" }],
+  openGraph: {
+    title: "14 - The Valentine's Day Poll",
+    description: "Cast your vote this Valentine's Day. Single or in a relationship? See the live results.",
+    url: "https://14-poll.vercel.app", // Adjust if you have a specific domain
+    siteName: "14",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "14 - Valentine's Day Poll Social Image",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "14 - The Valentine's Day Poll",
+    description: "Are you single or in a relationship? Vote now and see the live Valentine's Day stats!",
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: "/favicon.png",
   },

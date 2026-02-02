@@ -81,9 +81,9 @@ export function CallToAction() {
       />
 
       <div className="space-y-4">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
-          Everyone will know. &quot;Statistically&quot;
-        </h2>
+        <h1 className="text-center text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+          The Valentine's Day Poll: &quot;Everyone will know.&quot;
+        </h1>
 
         <p className="mx-auto max-w-lg text-balance text-center text-sm font-medium text-muted-foreground md:text-base">
           Wait on our{" "}
