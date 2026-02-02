@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+
 import { Toaster } from "sonner";
 import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
@@ -17,13 +18,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+
 export const metadata: Metadata = {
-  title: "14 - The Valentine's Day Poll | Everyone will know.",
+  title: "14 - For Singles",
   description: "Join the largest real-time Valentine's Day poll. Are you single or in a relationship? Cast your vote and see where you stand statistically this February 14th.",
   keywords: ["Valentine's Day", "Poll", "Relationship Status", "February 14", "Love Statistics", "Real-time Poll"],
   authors: [{ name: "14 Team" }],
   openGraph: {
-    title: "14 - The Valentine's Day Poll",
+    title: "14 - For Singles",
     description: "Cast your vote this Valentine's Day. Single or in a relationship? See the live results.",
     url: "https://14-poll.vercel.app", // Adjust if you have a specific domain
     siteName: "14",
@@ -57,9 +65,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-transparent`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased bg-transparent`}
         suppressHydrationWarning
       >
+
         <Script
           strategy="lazyOnload"
           src="https://cloud.umami.is/script.js"
