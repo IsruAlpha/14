@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 export function ThemeProvider({ children }: { children: ReactNode }) {
     return (
         <NextThemeProvider
-            defaultTheme="system"
+            defaultTheme="light"
             defaultColorTheme="default"
             colorThemes={["default", "blue", "green"]}
         >

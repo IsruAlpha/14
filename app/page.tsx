@@ -21,12 +21,14 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CallToAction } from "@/components/cta";
+import dynamic from "next/dynamic";
 import HoverSlatButton from "@/components/ui/hover-button";
-import { ProfileForm } from "@/components/profile-form";
 import { ProfileDropdown } from "@/components/profile-dropdown";
-import { ComingSoonPage } from "@/components/coming-soon";
 import { ThemeToggle } from "@/components/ThemeToggle";
+
+const CallToAction = dynamic(() => import("@/components/cta").then(mod => mod.CallToAction), { ssr: false });
+const ProfileForm = dynamic(() => import("@/components/profile-form").then(mod => mod.ProfileForm), { ssr: false });
+const ComingSoonPage = dynamic(() => import("@/components/coming-soon").then(mod => mod.ComingSoonPage), { ssr: false });
 
 const VOTER_ID_KEY = "poll_voter_id";
 const HAS_VOTED_KEY = "poll_has_voted";
