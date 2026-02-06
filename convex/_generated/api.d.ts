@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as automated from "../automated.js";
+import type * as chats from "../chats.js";
+import type * as messages from "../messages.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as poll from "../poll.js";
 import type * as profiles from "../profiles.js";
@@ -19,6 +22,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  automated: typeof automated;
+  chats: typeof chats;
+  messages: typeof messages;
   myFunctions: typeof myFunctions;
   poll: typeof poll;
   profiles: typeof profiles;

@@ -17,24 +17,32 @@ import { useRef, useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import HoverSlatButton from "@/components/ui/hover-button";
+import { Facehash } from "facehash";
+
 
 const formSchema = z.object({
+    yourName: z.string().min(2, {
+        message: "Your name must be at least 2 characters.",
+    }),
     fullName: z.string().min(2, {
         message: "Name must be at least 2 characters.",
     }),
-    status: z.string(),
     image: z.instanceof(File).optional(),
 });
+
 
 interface ProfileFormProps {
     voterId: string;
     userStatus: "single" | "relationship";
     onProfileCreated: () => void;
     existingProfile?: {
+        yourName?: string;
         fullName: string;
         imageUrl?: string;
     } | null;
+
 }
+
 
 export function ProfileForm({ voterId, userStatus, onProfileCreated, existingProfile }: ProfileFormProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(existingProfile?.imageUrl || null);
@@ -45,26 +53,31 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            yourName: existingProfile?.yourName || "",
             fullName: existingProfile?.fullName || "",
-            status: userStatus === "single" ? "Single" : "In Relationship",
             image: undefined,
         },
     });
 
+    const watchedYourName = form.watch("yourName");
+
+
+
     // Update form when existingProfile changes
     useEffect(() => {
         if (existingProfile) {
+            form.setValue("yourName", existingProfile.yourName ?? "");
             form.setValue("fullName", existingProfile.fullName);
             if (existingProfile.imageUrl) {
                 setImagePreview(existingProfile.imageUrl);
             }
         }
+
     }, [existingProfile, form]);
 
-    // Update status when userStatus changes
-    useEffect(() => {
-        form.setValue("status", userStatus === "single" ? "Single" : "In Relationship");
-    }, [userStatus, form]);
+
+    // Status is no longer in the form, but still passed to mutation
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -97,10 +110,12 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
             // Create profile
             await createProfile({
                 voterId,
+                yourName: values.yourName,
                 fullName: values.fullName,
                 status: userStatus,
                 imageId,
             });
+
 
             onProfileCreated();
         } catch (error) {
@@ -109,26 +124,30 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
     }
 
     return (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md space-y-6 relative">
+
+
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-foreground">Create Your Profile</h2>
+
+                <h2 className="text-2xl font-medium text-foreground font-serif">Customize your crush</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                     Complete your profile to get started
                 </p>
             </div>
 
+
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                     <FormField
                         control={form.control}
-                        name="fullName"
+                        name="yourName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Full Name</FormLabel>
+                                <FormLabel>Your Name</FormLabel>
                                 <FormControl>
                                     <Input
                                         className="bg-card"
-                                        placeholder="John Doe"
+                                        placeholder="Your name"
                                         {...field}
                                     />
                                 </FormControl>
@@ -139,22 +158,24 @@ export function ProfileForm({ voterId, userStatus, onProfileCreated, existingPro
 
                     <FormField
                         control={form.control}
-                        name="status"
+                        name="fullName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Status</FormLabel>
+                                <FormLabel>His/Her Name</FormLabel>
                                 <FormControl>
                                     <Input
-                                        className="bg-muted"
+                                        className="bg-card"
+                                        placeholder="Crush name"
                                         {...field}
-                                        disabled
-                                        readOnly
                                     />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
+
+
+
 
                     <FormItem>
                         <FormLabel>Profile Image</FormLabel>

@@ -13,10 +13,12 @@ export const generateUploadUrl = mutation({
 export const createProfile = mutation({
     args: {
         voterId: v.string(),
+        yourName: v.string(),
         fullName: v.string(),
         status: v.union(v.literal("single"), v.literal("relationship")),
         imageId: v.optional(v.id("_storage")),
     },
+
     handler: async (ctx, args) => {
         // Check if profile already exists
         const existing = await ctx.db
@@ -27,6 +29,7 @@ export const createProfile = mutation({
         if (existing) {
             // Update existing profile
             const updates: any = {
+                yourName: args.yourName,
                 fullName: args.fullName,
             };
             if (args.imageId !== undefined) {
@@ -36,14 +39,18 @@ export const createProfile = mutation({
             return existing._id;
         }
 
+
         // Create new profile
         const profileId = await ctx.db.insert("profiles", {
             voterId: args.voterId,
+            yourName: args.yourName,
             fullName: args.fullName,
             status: args.status,
             imageId: args.imageId,
+            nextAutomatedMessageAt: Date.now() + Math.random() * 24 * 60 * 60 * 1000,
             createdAt: Date.now(),
         });
+
 
         return profileId;
     },

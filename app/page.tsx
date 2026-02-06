@@ -25,25 +25,19 @@ import dynamic from "next/dynamic";
 import HoverSlatButton from "@/components/ui/hover-button";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { getOrCreateVoterId, VOTER_ID_KEY } from "@/lib/utils";
+
+
 
 const CallToAction = dynamic(() => import("@/components/cta").then(mod => mod.CallToAction), { ssr: false });
 const ProfileForm = dynamic(() => import("@/components/profile-form").then(mod => mod.ProfileForm), { ssr: false });
 const ComingSoonPage = dynamic(() => import("@/components/coming-soon").then(mod => mod.ComingSoonPage), { ssr: false });
 
-const VOTER_ID_KEY = "poll_voter_id";
 const HAS_VOTED_KEY = "poll_has_voted";
-
 const STATUS_VALUES = ["single", "relationship"] as const;
 
-function getOrCreateVoterId(): string {
-  if (typeof window === "undefined") return "";
-  let id = localStorage.getItem(VOTER_ID_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(VOTER_ID_KEY, id);
-  }
-  return id;
-}
+
+
 
 const formSchema = z.object({
   status: z.enum(STATUS_VALUES, {
@@ -169,7 +163,7 @@ export default function Home() {
       >
         {/* Voting View */}
         <div className="flex h-screen w-screen flex-col overflow-y-auto">
-          <div className="flex flex-1 flex-col items-center justify-center p-6 py-12 md:py-20">
+          <div id="voting-section" className="flex flex-1 flex-col items-center justify-center p-6 py-12 md:py-20">
             <div className="w-full max-w-md space-y-6">
               {showSuccess && (
                 <Alert className="flex flex-row items-start gap-3 border-success/80 bg-success/5 text-success">
@@ -293,7 +287,17 @@ export default function Home() {
             </div>
           </div>
 
-          <CallToAction />
+          <CallToAction
+            voted={voted}
+            onGetStarted={() => {
+              if (!voted) {
+                toast("Vote to Get Started.");
+                document.getElementById("voting-section")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                handleBuildClick();
+              }
+            }}
+          />
         </div>
 
         {/* Profile Form View */}
@@ -303,16 +307,26 @@ export default function Home() {
             userStatus={userStatus}
             onProfileCreated={handleProfileCreated}
             existingProfile={profile ? {
+              yourName: profile.yourName ?? "",
               fullName: profile.fullName,
               imageUrl: profile.imageUrl ?? undefined
             } : null}
+
+
           />
         </div>
 
         {/* Profile Complete View */}
         <div className="flex h-screen w-screen flex-col items-center overflow-y-auto overflow-x-hidden">
-          <ComingSoonPage onEditProfile={handleEditProfile} />
+          {profile && (
+            <ComingSoonPage
+              onEditProfile={handleEditProfile}
+              crushName={profile.fullName}
+              crushImageUrl={profile.imageUrl ?? undefined}
+            />
+          )}
         </div>
+
       </div>
 
       {/* Top Controls - Global for this page */}
@@ -320,13 +334,15 @@ export default function Home() {
         <ThemeToggle />
         {viewState === "profile-complete" && profile && (
           <ProfileDropdown
-            fullName={profile.fullName}
+            yourName={profile.yourName || "User"}
+            crushName={profile.fullName}
             status={profile.status === "single" ? "Single" : "In Relationship"}
             imageUrl={profile.imageUrl ?? undefined}
             onLogout={handleLogout}
             onEditProfile={handleEditProfile}
           />
         )}
+
       </div>
     </main>
   );
