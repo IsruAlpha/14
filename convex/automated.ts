@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, action, internalMutation } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 
-const GROQ_KEY = "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";
+const GROQ_KEY = process.env.GROQ_API_KEY;
 const GROQ_BASE_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export const checkAndTrigger = action({

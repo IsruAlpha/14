@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const GROQ_KEY = "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";
+const GROQ_KEY = process.env.GROQ_API_KEY;
 const GROQ_BASE_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export async function POST(request: Request) {
