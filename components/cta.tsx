@@ -18,7 +18,7 @@ const CrushDecoration = () => (
     viewBox="0 0 44 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="absolute -bottom-4 -left-2 w-12 h-12 pointer-events-none text-foreground"
+    className="absolute -bottom-6 -right-8 w-12 h-12 pointer-events-none text-foreground"
   >
     <path
       d="M2.5 37.5L41.5 2.5"
@@ -69,6 +69,15 @@ export function CallToAction({ voted, onGetStarted }: CallToActionProps) {
         aria-hidden
       />
 
+      {/* Background Illustration / Decoration - NOW AT THE TOP */}
+      <div className="flex w-full justify-center opacity-70 transition-all hover:opacity-90 dark:brightness-90">
+        <img
+          src="/launch-illustration.png"
+          alt="Launch Celebration"
+          className="h-auto w-full max-w-sm object-contain"
+        />
+      </div>
+
       <div className="space-y-4">
         <h1 className="text-center text-4xl font-medium tracking-tight text-foreground md:text-5xl lg:text-7xl font-serif">
           Talk to your{" "}
@@ -91,7 +100,7 @@ export function CallToAction({ voted, onGetStarted }: CallToActionProps) {
         </p>
       </div>
 
-      {/* Main CTA Block */}
+      {/* Main CTA Block - NOW AT THE BOTTOM */}
       <div className="relative mx-auto flex w-full max-w-3xl flex-col justify-between border-x md:flex-row bg-background/50 backdrop-blur-sm shadow-xl">
         <div className="-translate-x-1/2 -top-px pointer-events-none absolute left-1/2 w-screen border-t" />
         <div className="border-b p-4 md:border-b-0 flex items-center justify-center md:justify-start flex-1">
@@ -110,15 +119,6 @@ export function CallToAction({ voted, onGetStarted }: CallToActionProps) {
           </Button>
         </div>
         <div className="-translate-x-1/2 -bottom-px pointer-events-none absolute left-1/2 w-screen border-b" />
-      </div>
-
-      {/* Background Illustration / Decoration */}
-      <div className="flex w-full justify-center opacity-70 transition-all hover:opacity-90 dark:brightness-90">
-        <img
-          src="/launch-illustration.png"
-          alt="Launch Celebration"
-          className="h-auto w-full max-w-sm object-contain"
-        />
       </div>
     </section>
   );
