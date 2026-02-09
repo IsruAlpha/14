@@ -17,6 +17,7 @@ export const createProfile = mutation({
         fullName: v.string(),
         status: v.union(v.literal("single"), v.literal("relationship")),
         imageId: v.optional(v.id("_storage")),
+        email: v.optional(v.string()),
     },
 
     handler: async (ctx, args) => {
@@ -35,6 +36,9 @@ export const createProfile = mutation({
             if (args.imageId !== undefined) {
                 updates.imageId = args.imageId;
             }
+            if (args.email !== undefined) {
+                updates.email = args.email;
+            }
             await ctx.db.patch(existing._id, updates);
             return existing._id;
         }
@@ -47,6 +51,7 @@ export const createProfile = mutation({
             fullName: args.fullName,
             status: args.status,
             imageId: args.imageId,
+            email: args.email,
             nextAutomatedMessageAt: Date.now() + Math.random() * 24 * 60 * 60 * 1000,
             createdAt: Date.now(),
         });
@@ -90,6 +95,7 @@ export const updateProfile = mutation({
         voterId: v.string(),
         fullName: v.optional(v.string()),
         imageId: v.optional(v.id("_storage")),
+        email: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const profile = await ctx.db
@@ -104,6 +110,7 @@ export const updateProfile = mutation({
         const updates: any = {};
         if (args.fullName !== undefined) updates.fullName = args.fullName;
         if (args.imageId !== undefined) updates.imageId = args.imageId;
+        if (args.email !== undefined) updates.email = args.email;
 
         await ctx.db.patch(profile._id, updates);
     },

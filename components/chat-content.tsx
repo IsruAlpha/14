@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvex } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { getOrCreateVoterId } from "@/lib/utils";
 import { CornerDownLeft, ArrowLeft } from "lucide-react";
@@ -24,8 +24,10 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { toast } from "sonner";
 import { NotificationBell } from "@/components/notification-bell";
 import { useAutomatedMessages } from "@/hooks/use-automated-messages";
+import { PricingModal } from "./pricing-modal";
 
 export function ChatContent() {
+    const convex = useConvex();
     const searchParams = useSearchParams();
     const router = useRouter();
     const chatIdFromUrl = searchParams.get("id") as Id<"chats"> | null;
@@ -35,6 +37,8 @@ export function ChatContent() {
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [activeChatId, setActiveChatId] = useState<Id<"chats"> | null>(chatIdFromUrl);
+    const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+    const [limitError, setLimitError] = useState<{ title: string, description: string } | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -95,6 +99,19 @@ export function ChatContent() {
         setIsLoading(true);
 
         try {
+            // 0. Check limit first (to avoid console errors from mutation)
+            const limitStatus = await convex.query(api.messages.checkLimit, { voterId });
+            if (limitStatus.isLimited) {
+                setLimitError({
+                    title: "Daily Limit Reached",
+                    description: `Daily limit reached! Come back in ${limitStatus.waitTimeText} or upgrade to Premium for unlimited chat.`
+                });
+                setIsPricingModalOpen(true);
+                setIsLoading(false);
+                setInput(userInput);
+                return;
+            }
+
             // 1. Create a chat if it doesn't exist
             if (!currentChatId) {
                 currentChatId = await createChat({
@@ -133,19 +150,20 @@ export function ChatContent() {
             });
 
         } catch (error: any) {
-            console.error("Chat error:", error);
-
-            if (error.message.includes("402") || error.message.includes("Quota")) {
-                toast.error("AI Quota Exceeded", {
-                    description: "The AI is taking a nap because we've hit the limit. Please try again later!",
-                    duration: 5000,
+            if (error.message.includes("Daily limit reached")) {
+                setLimitError({
+                    title: "Daily Limit Reached",
+                    description: error.message
                 });
+                setIsPricingModalOpen(true);
             } else {
-                toast.error("Message Failed", {
-                    description: error.message || "Something went wrong while sending your message.",
-                });
+                console.error("Chat error:", error);
+                if (error.message.includes("402") || error.message.includes("Quota")) {
+                    toast.error("AI service credits exhausted. Please try again later.");
+                } else {
+                    toast.error("Failed to send message. Please try again.");
+                }
             }
-
             setInput(userInput);
         } finally {
             setIsLoading(false);
@@ -274,6 +292,13 @@ export function ChatContent() {
                     </div>
                 </div>
             </div>
+            {/* Pricing Modal */}
+            <PricingModal
+                isOpen={isPricingModalOpen}
+                onClose={() => setIsPricingModalOpen(false)}
+                title={limitError?.title}
+                description={limitError?.description}
+            />
         </main>
     );
 }

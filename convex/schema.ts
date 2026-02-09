@@ -18,6 +18,9 @@ export default defineSchema({
     imageId: v.optional(v.id("_storage")),
     lastAutomatedMessageAt: v.optional(v.number()),
     nextAutomatedMessageAt: v.optional(v.number()),
+    messageCountToday: v.optional(v.number()),
+    lastMessageAt: v.optional(v.number()),
+    email: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_voter_id", ["voterId"]),
 
